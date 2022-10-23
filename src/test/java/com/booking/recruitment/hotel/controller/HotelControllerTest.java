@@ -6,7 +6,6 @@ import com.booking.recruitment.hotel.repository.CityRepository;
 import com.booking.recruitment.hotel.repository.HotelRepository;
 import com.booking.testing.SlowTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,42 +85,18 @@ class HotelControllerTest {
         equalTo(newHotel));
   }
 
-  @Disabled
   @Test
   @DisplayName("When hotel requested by id this entity is returned")
-  void hotelFoundById() throws Exception {
-    City city =
-            cityRepository
-                    .findById(1L)
-                    .orElseThrow(
-                            () -> new IllegalStateException("Test dataset does not contain a city with ID 1!"));
-    Hotel newHotel = Hotel.builder().setName("This is a test hotel").setCity(city).build();
-
-    Long newHotelId =
-            mapper
-                    .readValue(
-                            mockMvc
-                                    .perform(
-                                            post("/hotel")
-                                                    .contentType(MediaType.APPLICATION_JSON)
-                                                    .content(mapper.writeValueAsString(newHotel)))
-                                    .andExpect(status().isCreated())
-                                    .andReturn()
-                                    .getResponse()
-                                    .getContentAsString(),
-                            Hotel.class)
-                    .getId();
-
-    newHotel.setId(newHotelId); // Populate the ID of the hotel after successful creation
+  void hotelFoundById() {
+    Hotel randomHotel = hotelRepository.findAll().get(0);
 
     assertThat(
             hotelRepository
-                    .findById(newHotelId)
+                    .findById(randomHotel.getId())
                     .orElseThrow(
                             () -> new IllegalStateException("New Hotel has not been saved in the repository")),
-            equalTo(newHotel));
+            equalTo(randomHotel));
   }
-
 
   @Test
   @DisplayName("When requested search for nearest 3 hotels they returned correctly")
