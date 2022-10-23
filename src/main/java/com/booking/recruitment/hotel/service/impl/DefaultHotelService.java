@@ -7,6 +7,7 @@ import com.booking.recruitment.hotel.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -45,6 +46,13 @@ class DefaultHotelService implements HotelService {
   @Override
   public Hotel getHotel(Long id) {
     return hotelRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
+
+  @Override
+  @Transactional
+  public void deleteHotelLogically(Long id) {
+    hotelRepository.deleteByIdLogically(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 }
