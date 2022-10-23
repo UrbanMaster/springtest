@@ -1,7 +1,9 @@
 package com.booking.recruitment.hotel.service.impl;
 
 import com.booking.recruitment.hotel.exception.BadRequestException;
+import com.booking.recruitment.hotel.model.City;
 import com.booking.recruitment.hotel.model.Hotel;
+import com.booking.recruitment.hotel.repository.CityRepository;
 import com.booking.recruitment.hotel.repository.HotelRepository;
 import com.booking.recruitment.hotel.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,13 @@ import java.util.stream.Collectors;
 @Service
 class DefaultHotelService implements HotelService {
   private final HotelRepository hotelRepository;
+  private final CityRepository cityRepository;
 
   @Autowired
-  DefaultHotelService(HotelRepository hotelRepository) {
+  DefaultHotelService(HotelRepository hotelRepository,
+                      CityRepository cityRepository) {
     this.hotelRepository = hotelRepository;
+    this.cityRepository = cityRepository;
   }
 
   @Override
@@ -54,5 +59,13 @@ class DefaultHotelService implements HotelService {
   public void deleteHotelLogically(Long id) {
     hotelRepository.deleteByIdLogically(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
+
+  @Override
+  public List<Hotel> searchNearestToCityCenter(Long cityId) {
+    final City city = cityRepository.findById(cityId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    return hotelRepository.searchNearestTo(city.getCityCentreLatitude(),city.getCityCentreLongitude());
   }
 }

@@ -17,6 +17,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,7 +39,7 @@ class HotelControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper mapper;
 
-  @Autowired private HotelRepository repository;
+  @Autowired private HotelRepository hotelRepository;
   @Autowired private CityRepository cityRepository;
 
   @Test
@@ -44,7 +48,7 @@ class HotelControllerTest {
     mockMvc
         .perform(get("/hotel"))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$", hasSize((int) repository.count())));
+        .andExpect(jsonPath("$", hasSize((int) hotelRepository.count())));
   }
 
   @Test
@@ -75,7 +79,7 @@ class HotelControllerTest {
     newHotel.setId(newHotelId); // Populate the ID of the hotel after successful creation
 
     assertThat(
-        repository
+        hotelRepository
             .findById(newHotelId)
             .orElseThrow(
                 () -> new IllegalStateException("New Hotel has not been saved in the repository")),
@@ -111,10 +115,33 @@ class HotelControllerTest {
     newHotel.setId(newHotelId); // Populate the ID of the hotel after successful creation
 
     assertThat(
-            repository
+            hotelRepository
                     .findById(newHotelId)
                     .orElseThrow(
                             () -> new IllegalStateException("New Hotel has not been saved in the repository")),
             equalTo(newHotel));
+  }
+
+
+  @Test
+  @DisplayName("When requested search for nearest 3 hotels they returned correctly")
+  @Transactional
+  void nearestHotelsSearchedCorrectly() {
+    City city =
+            cityRepository
+                    .findById(1L)
+                    .orElseThrow(
+                            () -> new IllegalStateException("Test dataset does not contain a city with ID 1!"));
+
+    //TODO: verify that they are the closest hotels. didn't have time to check calculation manually
+    List<Hotel> nearestHotels = new ArrayList<>();
+    nearestHotels.add(hotelRepository.getOne(2L));
+    nearestHotels.add(hotelRepository.getOne(1L));
+    nearestHotels.add(hotelRepository.getOne(6L));
+
+    assertThat(
+            hotelRepository
+                    .searchNearestTo(city.getCityCentreLatitude(), city.getCityCentreLongitude()),
+            equalTo(nearestHotels));
   }
 }

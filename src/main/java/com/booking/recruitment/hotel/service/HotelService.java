@@ -14,4 +14,6 @@ public interface HotelService {
   Hotel getHotel(Long id);
 
   void deleteHotelLogically(Long id);
+
+  List<Hotel> searchNearestToCityCenter(Long cityId);
 }
