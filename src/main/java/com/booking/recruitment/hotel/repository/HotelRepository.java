@@ -14,7 +14,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     @Modifying
     @Query("update Hotel h set h.deleted = true where h.id = :id")
-    Optional<Hotel> deleteByIdLogically(Long id);
+    void deleteByIdLogically(Long id);
 
     @Query(value = "SELECT *, ( 3959 * acos( cos( radians(:cityCentreLatitude) ) * cos( radians( h.latitude ) ) * cos( radians(h.longitude) - radians(:cityCentreLongitude) ) + sin( radians(:cityCentreLatitude) ) * sin( radians(h.latitude)))) AS distance " +
             "FROM hotel h " +

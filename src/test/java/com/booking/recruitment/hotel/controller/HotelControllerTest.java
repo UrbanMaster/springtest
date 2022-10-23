@@ -6,6 +6,7 @@ import com.booking.recruitment.hotel.repository.CityRepository;
 import com.booking.recruitment.hotel.repository.HotelRepository;
 import com.booking.testing.SlowTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,6 +86,20 @@ class HotelControllerTest {
         equalTo(newHotel));
   }
 
+  @Disabled
+  @Test
+  @DisplayName("When hotel requested by id this entity is returned")
+  void hotelDeletedLogicallyById() {
+    Hotel randomHotel = hotelRepository.findAll().get(0);
+    hotelRepository.deleteByIdLogically(randomHotel.getId());
+
+    assertThat(
+            hotelRepository
+                    .findById(randomHotel.getId())
+                    .isPresent(),
+            equalTo(false));
+  }
+
   @Test
   @DisplayName("When hotel requested by id this entity is returned")
   void hotelFoundById() {
@@ -94,7 +109,7 @@ class HotelControllerTest {
             hotelRepository
                     .findById(randomHotel.getId())
                     .orElseThrow(
-                            () -> new IllegalStateException("New Hotel has not been saved in the repository")),
+                            () -> new IllegalStateException("Hotel has not been found in the repository")),
             equalTo(randomHotel));
   }
 

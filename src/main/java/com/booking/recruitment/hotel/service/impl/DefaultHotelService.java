@@ -57,8 +57,7 @@ class DefaultHotelService implements HotelService {
   @Override
   @Transactional
   public void deleteHotelLogically(Long id) {
-    hotelRepository.deleteByIdLogically(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    hotelRepository.deleteByIdLogically(id);
   }
 
   @Override
