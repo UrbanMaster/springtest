@@ -5,7 +5,9 @@ import com.booking.recruitment.hotel.model.Hotel;
 import com.booking.recruitment.hotel.repository.HotelRepository;
 import com.booking.recruitment.hotel.service.HotelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,5 +40,11 @@ class DefaultHotelService implements HotelService {
     }
 
     return hotelRepository.save(hotel);
+  }
+
+  @Override
+  public Hotel getHotel(Long id) {
+    return hotelRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 }
